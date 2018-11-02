@@ -13,7 +13,7 @@ word_vectorizer = TfidfVectorizer(
     ngram_range=WORD_NGRAM_RANGE,
     analyzer='word',
     stop_words='english',
-    max_features=MAX_FEATURES)
+    max_features=MAX_FEATURES_WORD)
 
 char_vectorizer = TfidfVectorizer(
     sublinear_tf=True,
@@ -21,10 +21,10 @@ char_vectorizer = TfidfVectorizer(
     analyzer='char',
     stop_words='english',
     ngram_range=CHAR_NGRAM_RANGE,
-    max_features=MAX_FEATURES)
+    max_features=MAX_FEATURES_CHAR)
 
-train = pd.read_csv(TRAIN_FILE).fillna(' ')[:1000]
-test = pd.read_csv(TEST_FILE).fillna(' ')[:1000]
+train = pd.read_csv(TRAIN_FILE).fillna(' ')[:NUM_SAMPLES]
+test = pd.read_csv(TEST_FILE).fillna(' ')[:NUM_SAMPLES]
 
 train_text = train['comment_text']
 test_text = test['comment_text']
@@ -49,40 +49,13 @@ X = train_features = hstack((np.ones((data_len, 1)),
                              train_features)).toarray()
 y = train['toxic']
 
-from scipy import optimize
-options= {'maxiter': 400}
-
-
-initial_theta = np.random.uniform(size=(X.shape[1],))
-# initial_theta = np.zeros(X.shape[1])
-lambda_ = LAMBDA
-res = optimize.minimize(cost_function,
-                        initial_theta,
-                        (X, y, lambda_),
-                        jac=True,
-                        method='TNC',
-                        options=options)
-
-cost = res.fun
-theta = res.x
-
-def predict(theta, X):
-    m = X.shape[0] # Number of training examples
-    p = np.zeros(m)
-    for i in range(m):
-        if sigmoid(np.dot(X[i], theta)) >= 1/2:
-            p[i] = 1
-    return p
-
-p = predict(theta, X)
-
+log_reg = Logistic_Regression(lr=LR, num_iter=NUM_ITER, lambda_=LAMBDA)
+log_reg.fit_SGD(train_features, train['toxic'])
+p = log_reg.predict(X)
 print('Train Accuracy: %.1f %%' % (np.mean(p == y) * 100))
 
-# LogReg = Logistic_Regression(lr=LR, num_iter=NUM_ITER, lambda_=LAMBDA)
-# LogReg.fit(train_features, train['toxic'])
-# 
 # train_accuracy = np.mean((LogReg.predict(train_features) ==
-#                   train['toxic']))
+#                           train['toxic']))
 # 
 # scores = []
 # submission = pd.DataFrame.from_dict({'id': test['id']})
