@@ -44,15 +44,28 @@ test_features = hstack([test_char_features, test_word_features])
 data_len = train_features.shape[0]
 
 
-# add column of 1 
+# add column of 1
+
 X = train_features = hstack((np.ones((data_len, 1)),
                              train_features)).toarray()
 y = train['toxic']
 
-log_reg = Logistic_Regression(lr=LR, num_iter=NUM_ITER, lambda_=LAMBDA)
-log_reg.fit_SGD(train_features, train['toxic'])
-p = log_reg.predict(X)
-print('Train Accuracy: %.1f %%' % (np.mean(p == y) * 100))
+
+def prepare_data():
+    return X, y
+           
+
+# X = train_features = hstack((np.ones((data_len, 1)),
+#                              train_features)).toarray()
+# y = train['toxic']
+# 
+# log_reg = Logistic_Regression(lr=LR,
+#                               num_iter=NUM_ITER,
+#                               lambda_=LAMBDA,
+#                               b=BETTA)
+# log_reg.fit_SGD(X, y)
+# p = log_reg.predict(X)
+# print('Train Accuracy: %.1f %%' % (np.mean(p == y) * 100))
 
 # train_accuracy = np.mean((LogReg.predict(train_features) ==
 #                           train['toxic']))

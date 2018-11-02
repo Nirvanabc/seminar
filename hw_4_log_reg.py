@@ -1,7 +1,7 @@
 import numpy as np
 
 LR = 0.5
-NUM_ITER = 300
+NUM_ITER = 30
 THRESHOLD = 0.5
 LAMBDA = 0.5
 BETTA = 0.9
@@ -59,22 +59,22 @@ class Logistic_Regression:
             loss_array.append(loss)
         self.loss_list = loss_array
 
-
     
     def fit_SGD(self, X, y):
         m = y.size
-        self.theta = np.random.uniform(size=(X.shape[1],))
+        # self.theta = np.random.uniform(size=(X.shape[1],))
+        self.theta = np.zeros(X.shape[1])
         loss_array = []
         for epoch in range(self.num_iter):
-            tmp_grad = 0
+            # tmp_grad = 0
             for sample in range(X.shape[0]):
                 X_i = X[sample,:].reshape(1, X.shape[1])
                 y_i = y[sample]
                 loss, grad = self.cost_function(self.theta, X_i, y_i)
-                grad = tmp_grad * self.b + (1 - self.b) * grad
-                tmp_grad = grad
+                # grad = self.b * tmp_grad + (1 - self.b) * grad
+                # tmp_grad = grad
                 self.theta -= self.lr * grad
-                # print("step: {}, loss: {} ".format(i, loss))
+                # print("step: {}, loss: {} ".format(epoch, loss))
             loss_array.append(loss)
         self.loss_list = loss_array
         
