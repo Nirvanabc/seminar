@@ -46,6 +46,7 @@ data_len = train_features.shape[0]
 
 # add column of 1
 
+X = (X - np.mean(X, axis=0))/X.std(axis=0)
 X = train_features = hstack((np.ones((data_len, 1)),
                              train_features)).toarray()
 y = train['toxic']
