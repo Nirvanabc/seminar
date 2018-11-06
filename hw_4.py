@@ -1,8 +1,11 @@
 from hw_4_header import *
-from hw_4_preprocessing import *
+import hw_4_preprocessing
 from sklearn.model_selection import StratifiedKFold
-from  hyperopt import hp, fmin, pyll, tpe
-# import numpy as np
+from hyperopt import hp, fmin, pyll, tpe
+from sklearn.metrics import f1_score
+from hw_4_log_reg import *
+from sklearn.metrics import roc_auc_score
+
 
 ### evaluating functions
 def evaluate(X, y, X_test, y_test, lr, lambda_, b):
@@ -12,9 +15,25 @@ def evaluate(X, y, X_test, y_test, lr, lambda_, b):
                                 b=b)
     model.fit_SGD(X, y)
     y_pred = model.predict(X_test)
+    ## I use this to make sure that there are not only zeros in my
+    ## predictions.
+    # print(np.count_nonzero(y_pred), len(y_pred))
+    print("{:.4f}".format(roc_auc_score(y_test, y_pred)))
     return -np.mean(y_pred == y_test)
-#     # we use '-' as fmin searches for minimum, but f1 should be maximized
-#     return -f1_score(y_test, y_pred, average='macro')
+    # we use '-' as fmin searches for minimum, but f1 should be maximized
+    # return -f1_score(y_test, y_pred, average='macro')
+
+
+def evaluate_test(X, y, X_test, y_test, lr, lambda_, b):
+    model = Logistic_Regression(lr=lr,
+                                num_iter=NUM_ITER,
+                                lambda_=lambda_,
+                                b=b)
+    model.fit_SGD(X, y)
+    y_pred = model.predict(X_test)
+    return -np.mean(y_pred == y_test)
+    # we use '-' as fmin searches for minimum, but f1 should be maximized
+    # return -f1_score(y_test, y_pred, average='macro')
 
 
 def objective(args):
@@ -22,25 +41,22 @@ def objective(args):
     lambda_ = args ['lambda_']
     b = args['b']
     pred = np.zeros(N_SPLITS)
-    predicted = evaluate(X,
-                         y,
-                         X_test,
-                         y_test,
-                         lr,
-                         lambda_,
-                         b)
-    # for i, [train_index, test_index] in enumerate(skf.split(X,y)):
-    #     X_train, X_test = X[train_index], X[test_index]
-    #     y_train, y_test = y[train_index], y[test_index]
-    #     pred[i] = evaluate(X_train,
-    #                        y_train,
-    #                        X_test,
-    #                        y_test,
-    #                        lr,
-    #                        lambda_,
-    #                        b)
-    # predicted = pred.mean()
-    print(predicted, lr, lambda_, b)
+    for i, [train_index, test_index] in enumerate(skf.split(X,y)):
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = y[train_index], y[test_index]
+        pred[i] = evaluate(X_train,
+                           y_train,
+                           X_test,
+                           y_test,
+                           lr,
+                           lambda_,
+                           b)
+    predicted = pred.mean()
+    print("pred {:.4f}, lr {:.4f}, lambda {:.4f}, b {:.4f} ".format(
+        -predicted,
+        lr,
+        lambda_,
+        b))
     return pred.mean()
 
 
@@ -56,7 +72,7 @@ def best_hyperparam():
 
 
 def score_on_test():
-    score = -evaluate(
+    score = -evaluate_test(
         X,
         y,
         X_test,
@@ -69,8 +85,6 @@ def score_on_test():
 
 
 ### tuning hyperparameters block
-## prepairings
-# prepairings for pipeline with knn
 
 space = {
     'lr': hp.choice('lr', lr_list),
@@ -78,13 +92,9 @@ space = {
     'b': hp.choice('b', b_list)
 }
 
-
 ### data preprocessing
-# train data
-X, y = prepare_data()
-
-# test data
-X_test, y_test = prepare_data()
+X, y = hw_4_preprocessing.prepare_train_data()
+X_test, y_test = hw_4_preprocessing.prepare_test_data()
 
 best_list = best_hyperparam()
 score = score_on_test()
