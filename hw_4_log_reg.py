@@ -18,7 +18,9 @@ class Logistic_Regression:
         
     def sigmoid(self, z):
         z = np.array(z)
-        return 1/(1 + 1/np.exp(z))
+        # print(z)
+        g = 1/(1 + np.exp(-z))
+        return g
 
         
     def cost_function(self, theta, X, y):
