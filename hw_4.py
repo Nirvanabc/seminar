@@ -1,8 +1,6 @@
 from hw_4_header import *
-from sklearn.linear_model import LogisticRegression
 import pandas as pd
 import hw_4_preprocessing
-from sklearn.model_selection import StratifiedKFold
 from hyperopt import hp, fmin, pyll, tpe
 from sklearn.metrics import f1_score
 from hw_4_log_reg import *
