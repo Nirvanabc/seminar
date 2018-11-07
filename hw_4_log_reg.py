@@ -1,7 +1,7 @@
 import numpy as np
 
 LR = 0.5
-NUM_ITER = 100
+NUM_ITER = 1000
 THRESHOLD = 0.5
 LAMBDA = 0.01
 BETTA = 0.98
@@ -49,21 +49,6 @@ class Logistic_Regression:
         return J, grad
 
     
-    def fit(self, X, y):
-        """
-        valilla gradient descent
-        """
-        m = y.size
-        self.theta = np.random.uniform(size=(X.shape[1],))
-        loss_array = []
-        for epoch in range(self.num_iter*10):
-            loss, grad = self.cost_function(self.theta, X, y)
-            self.theta -= self.lr * grad
-            # print("step: {}, loss: {} ".format(epoch, loss))
-            loss_array.append(loss)
-        self.loss_list = loss_array
-
-    
     def fit_SGD(self, X, y):
         """
         Stochastic gradient descent
@@ -72,6 +57,7 @@ class Logistic_Regression:
         self.theta = np.random.uniform(size=(X.shape[1],))
         loss_array = []
         tmp_grad = 0
+        # for epoch in range(self.num_iter):
         for sample in range(X.shape[0]):
             X_i = X[sample,:].reshape(1, X.shape[1])
             y_i = y[sample]
@@ -96,4 +82,19 @@ class Logistic_Regression:
             if self.predict_proba(X[i]) >= threshold:
                 p[i] = 1
         return p
+
+
+#     def fit(self, X, y):
+#         """
+#         valilla gradient descent
+#         """
+#         m = y.size
+#         self.theta = np.random.uniform(size=(X.shape[1],))
+#         loss_array = []
+#         for epoch in range(self.num_iter*10):
+#             loss, grad = self.cost_function(self.theta, X, y)
+#             self.theta -= self.lr * grad
+#             # print("step: {}, loss: {} ".format(epoch, loss))
+#             loss_array.append(loss)
+#         self.loss_list = loss_array
 

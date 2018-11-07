@@ -23,11 +23,14 @@ char_vectorizer = TfidfVectorizer(
     ngram_range=CHAR_NGRAM_RANGE,
     max_features=MAX_FEATURES_CHAR)
 
-train = pd.read_csv(TRAIN_FILE).fillna(' ')[:NUM_SAMPLES]
-test = pd.read_csv(TEST_FILE).fillna(' ')[:NUM_SAMPLES]
+train = pd.read_csv(TRAIN_FILE).fillna(' ')[:NUM_SAMPLES_TRAIN]
+test_X = pd.read_csv(TEST_X_FILE).fillna(' ')[:NUM_SAMPLES_TEST]
+test_y_all = pd.read_csv(TEST_Y_FILE)[:NUM_SAMPLES_TEST]
+test_y = test_y_all[~(test_y_all.toxic == -1)]
+test_X = test_X[~(test_y_all.toxic == -1)]
 
 train_text = train['comment_text']
-test_text = test['comment_text']
+test_text = test_X['comment_text']
 
 all_text = pd.concat([train_text, test_text])
 word_vectorizer.fit(all_text)
@@ -43,12 +46,16 @@ train_features = hstack([train_char_features, train_word_features])
 test_features = hstack([test_char_features, test_word_features])
 
 
-def prepare_train_data():
+def prepare_train_X():
     data_len = train_features.shape[0]
     X = train_features.toarray()
     X = np.concatenate([np.ones((data_len, 1)), X], axis=1)
-    y = np.array(train['toxic'])
-    return X, y
+    return X
 
-def prepare_test_data():
-    return prepare_train_data()
+
+def prepare_test_X():
+    # return prepare_train_X()
+    data_len = test_features.shape[0]
+    X = test_features.toarray()
+    X = np.concatenate([np.ones((data_len, 1)), X], axis=1)
+    return X
