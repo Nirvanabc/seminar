@@ -90,7 +90,7 @@ for class_name in CLASSES:
     # if you don't transfer it to array, you will have a mistake in fit as
     # lines will be counted starting not from zero
     y = np.array(hw_4_preprocessing.train[class_name])
-    y_test = np.array(hw_4_preprocessing.test_y[class_name])    
+    y_test = np.array(hw_4_preprocessing.test_y[class_name])
 
     best_list = best_hyperparam()
     score = score_on_test(best_list, X, y, X_test, y_test)
