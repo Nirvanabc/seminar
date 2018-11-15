@@ -98,3 +98,29 @@ for class_name in CLASSES:
     print('score for class {} is {:.4f}\n'.format(class_name, score))
 
 print('score {:.4}\n'.format(np.mean(scores)))
+
+
+preds = np.zeros((len(X_test), len(CLASSES)))
+
+scores = []
+for i, class_name in enumerate(CLASSES):
+    # if you don't transfer it to array, you will have a mistake in fit as
+    # lines will be counted starting not from zero
+    y = np.array(hw_4_preprocessing.train[class_name])
+    y_test = np.array(hw_4_preprocessing.test_y[class_name])    
+
+    best_list = best_hyperparam()
+    score = score_on_test(best_list, X, y, X_test, y_test)
+    model = Logistic_Regression(lr=lr_list[best_list['lr']],
+                                num_iter=NUM_ITER,
+                                lambda_=lambda_list[best_list['lambda_']],
+                                b=b_list[best_list['b']])
+    model.fit_SGD(X, y)
+    preds[:,i] = model.predict_proba(X_test)
+    scores.append(score)
+    print('score for class {} is {:.4f}\n'.format(class_name, score))
+
+print('score {:.4}\n'.format(np.mean(scores)))
+
+
+
