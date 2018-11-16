@@ -1,11 +1,12 @@
-from hw_4_header import *
 import pandas as pd
-import hw_4_preprocessing
 from hyperopt import hp, fmin, pyll, tpe
 from sklearn.metrics import f1_score
 from hw_4_log_reg import *
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import cross_val_score
+
+import hw_4_preprocessing_log_reg as preprocessing
+from hw_4_header_log_reg import *
 
 ### evaluating functions
 def evaluate(X, y, X_test, y_test, lr, lambda_, b):
@@ -42,11 +43,11 @@ def objective(args):
     predicted = pred.mean()
 
     # look at intermediate results
-    print("pred {:.4f}, lr {:.2f}, lambda {:.5f}, b {:.2f} ".format(
-        -predicted,
-        lr,
-        lambda_,
-        b))
+    # print("pred {:.4f}, lr {:.2f}, lambda {:.5f}, b {:.2f} ".format(
+    #     -predicted,
+    #     lr,
+    #     lambda_,
+    #     b))
     return predicted
 
 
@@ -81,23 +82,25 @@ space = {
 }
 
 ### data preprocessing
-X = hw_4_preprocessing.prepare_train_X()
-X_test = hw_4_preprocessing.prepare_test_X()
-# X_test = hw_4_preprocessing.prepare_train_X()
+X = preprocessing.prepare_train_X()
+X_test = preprocessing.prepare_test_X()
+subm = pd.read_csv(SUBM)
 
-scores = []
-for class_name in CLASSES:
-    # if you don't transfer it to array, you will have a mistake in fit as
-    # lines will be counted starting not from zero
-    y = np.array(hw_4_preprocessing.train[class_name])
-    y_test = np.array(hw_4_preprocessing.test_y[class_name])    
+# X_test = preprocessing.prepare_train_X()
 
-    best_list = best_hyperparam()
-    score = score_on_test(best_list, X, y, X_test, y_test)
-    scores.append(score)
-    print('score for class {} is {:.4f}\n'.format(class_name, score))
-
-print('score {:.4}\n'.format(np.mean(scores)))
+# scores = []
+# for class_name in CLASSES:
+#     # if you don't transfer it to array, you will have a mistake in fit as
+#     # lines will be counted starting not from zero
+#     y = np.array(preprocessing.train[class_name])
+#     y_test = np.array(preprocessing.test_y[class_name])    
+# 
+#     best_list = best_hyperparam()
+#     score = score_on_test(best_list, X, y, X_test, y_test)
+#     scores.append(score)
+#     print('score for class {} is {:.4f}'.format(class_name, score))
+# 
+# print('score {:.4}'.format(np.mean(scores)))
 
 
 preds = np.zeros((len(X_test), len(CLASSES)))
@@ -106,8 +109,8 @@ scores = []
 for i, class_name in enumerate(CLASSES):
     # if you don't transfer it to array, you will have a mistake in fit as
     # lines will be counted starting not from zero
-    y = np.array(hw_4_preprocessing.train[class_name])
-    y_test = np.array(hw_4_preprocessing.test_y[class_name])    
+    y = np.array(preprocessing.train[class_name])
+    y_test = np.array(preprocessing.test_y[class_name])    
 
     best_list = best_hyperparam()
     score = score_on_test(best_list, X, y, X_test, y_test)
@@ -118,9 +121,11 @@ for i, class_name in enumerate(CLASSES):
     model.fit_SGD(X, y)
     preds[:,i] = model.predict_proba(X_test)
     scores.append(score)
-    print('score for class {} is {:.4f}\n'.format(class_name, score))
+    print('score for class {} is {:.4f}'.format(class_name, score))
 
-print('score {:.4}\n'.format(np.mean(scores)))
-
-
-
+print('score {:.4}'.format(np.mean(scores)))
+submid = pd.DataFrame({'id': subm["id"]})
+submission = pd.concat([submid, pd.DataFrame(preds,
+                                             columns=CLASSES)],
+                       axis=1)
+submission.to_csv(SUBM_LOG_REG_FILE, index=False)
