@@ -1,6 +1,3 @@
-from sklearn.model_selection import StratifiedKFold
-import numpy as np
-
 ## for preprocessing
 TRAIN_FILE = 'train.csv'
 TEST_X_FILE = 'test.csv'
@@ -21,4 +18,4 @@ NUM_SAMPLES_TEST = 20000
 NUM_SAMPLES_TRAIN = 20000
 
 C = 4
-MAX_ITER = 1000
+MAX_ITER = 100

@@ -1,6 +1,8 @@
+glove*
 /ml-*
 
 *~
 *.csv
 __*
 *.zip
+best_subm*
