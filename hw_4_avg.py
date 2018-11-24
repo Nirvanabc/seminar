@@ -24,8 +24,6 @@ p_res.to_csv('submission.csv', index=False)
 scores = []
 for i, class_name in enumerate(CLASSES):
     pred_y = p_res[class_name]
-    m = len(pred_y)
-    p = np.zeros(m)
     score = roc_auc_score(test_y[class_name], pred_y)
     scores.append(score)
     print("for {}, score {}".format(class_name , score))

@@ -21,5 +21,5 @@ list_tokenized_test = tokenizer.texts_to_sequences(list_sentences_test)
 X_t = pad_sequences(list_tokenized_train, maxlen=MAXLEN)
 X_te = pad_sequences(list_tokenized_test, maxlen=MAXLEN)
 
-sample_submission = pd.read_csv(SUBM) # [:NUM_SAMPLES_TEST]
+sample_submission = pd.read_csv(SUBM) [:NUM_SAMPLES_TEST]
 sample_submission = sample_submission[~(test_y_all.toxic == -1)]

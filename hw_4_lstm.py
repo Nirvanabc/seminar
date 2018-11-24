@@ -44,7 +44,7 @@ model.compile(loss='binary_crossentropy',
 
 model.fit(X_t, y, batch_size=32, epochs=2, validation_split=0.1);
 y_test = model.predict([X_te], batch_size=1024, verbose=1)
-
-
-
+sample_submission = pd.read_csv('sample_submission.csv') #[:NUM_SAMPLES_TEST]
+sample_submission = sample_submission[~(test_y_all.toxic == -1)]
+sample_submission[CLASSES] = y_test
 sample_submission.to_csv(SUBM_LSTM_FILE, index=False)

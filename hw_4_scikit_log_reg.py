@@ -10,7 +10,8 @@ X_test = preprocessing.prepare_test_X()
 subm = pd.read_csv(SUBM)
 
 
-preds = np.zeros((len(X_test), len(CLASSES)))
+preds_test = np.zeros((len(X_test), len(CLASSES)))
+preds_train = np.zeros((len(X), len(CLASSES)))
 
 scores = []
 for i, class_name in enumerate(CLASSES):
@@ -29,7 +30,6 @@ for i, class_name in enumerate(CLASSES):
     print('score for class {} is {:.4f}'.format(class_name, cv_score))
     model.fit(X, y)
     preds[:,i] = model.predict_proba(X_test)[:, 1]
-
     
 
 print('score {:.4}'.format(np.mean(scores)))
